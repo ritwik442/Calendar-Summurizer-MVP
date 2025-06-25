@@ -1,34 +1,48 @@
-import React from 'react';
+// src/App.js
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import useSession from './hooks/useSession';
 
-function App() {
-  return (
-    <div className="flex flex-col h-full items-center justify-center bg-gray-200 text-gray-700">
-      <div className="flex items-center">
-        <h1 className="text-6xl font-thin tracking-wider">Create React App + Tailwind CSS</h1>
+/**
+ * A thin wrapper that:
+ *  • Shows a loading splash while the auth state is unknown
+ *  • Redirects unauthenticated users to /login
+ */
+function ProtectedRoute({ children }) {
+  const session = useSession();      // null → signed out, object → signed in, undefined → loading
+
+  if (session === undefined) {
+    return (
+      <div className="flex items-center justify-center h-screen text-lg">
+        Loading&hellip;
       </div>
-      <p className="my-6 tracking-wide">
-        Edit <code>src/App.js</code> and save to reload.
-      </p>
-      <div className="mt-6 flex justify-center">
-        <a
-          className="uppercase hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="ml-10 uppercase hover:underline"
-          href="https://tailwindcss.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Tailwind
-        </a>
-      </div>
-    </div>
-  );
+    );
+  }
+
+  return session ? children : <Navigate to="/login" replace />;
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Protected dashboard (root path) */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Public login page */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Catch-all → redirect to root */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  );
+}
