@@ -103,7 +103,7 @@ const { data: dbEvents } = await supabase
   .order('start_time', { ascending: true });   // ← no .limit()
    
 
-    if (error) console.error('[Supabase] upsert error', error);
+    if (err) console.error('[Supabase] upsert error', err);
     
     res.json(dbEvents);
   } catch (err) {
