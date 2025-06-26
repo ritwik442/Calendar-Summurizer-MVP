@@ -1,49 +1,74 @@
+// src/components/Dashboard.js
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
 import axios from 'axios';
+import { supabase } from '../lib/supabaseClient';
 import useSession from '../hooks/useSession';
 
 export default function Dashboard() {
-const session = useSession();         // value comes from hook
-const bearer  = { headers: { Authorization: `Bearer ${session?.access_token}` } };
-  
-
+  /* ---------- state ---------- */
+  const session = useSession();            // undefined → loading, null → signed-out
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchEvents = async () => {
+  /* ---------- helpers ---------- */
+  const bearer =
+    session?.access_token
+      ? { headers: { Authorization: `Bearer ${session.access_token}` } }
+      : null;
+
+  /* ---------- API calls ---------- */
+  const fetchEvents = async (withSummaries = false) => {
+    if (!session) return;                  // guard while signed-out
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:4000/api/events', bearer);
+      const { data } = await axios.get(
+        `http://localhost:4000/api/events?withSummaries=${withSummaries}`,
+        bearer
+      );
       setEvents(data);
     } catch (err) {
-      if (err.response?.data?.error === 'Google account not linked') {
-        alert('Please connect Google Calendar first.');
-      } else console.error(err);
+      console.error(err);
+      alert(err.response?.data?.error ?? 'Failed to fetch events');
     } finally {
       setLoading(false);
     }
   };
 
   const connectGoogle = async () => {
-    // Step 1: ask backend for Google consent URL
-    const { data } = await axios.get(
-      'http://localhost:4000/api/google/auth-url',
-      bearer
-    );
-    window.location.href = data.url; // full page redirect → Google consent
+    if (!session) return;
+    try {
+      const { data } = await axios.get(
+        'http://localhost:4000/api/google/auth-url',
+        bearer
+      );
+      window.location.href = data.url;     // redirect to Google consent
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error ?? 'Unable to get Google auth URL');
+    }
   };
 
+  /* ---------- lifecycle ---------- */
   useEffect(() => {
-    fetchEvents(); // attempt on mount; empty list means maybe not linked yet
+    if (session) fetchEvents(false);       // initial load after sign-in
     // eslint-disable-next-line
-  }, []);
+  }, [session]);
 
-  /* UI unchanged from earlier except added buttons */
+  /* ---------- early loading state ---------- */
+  if (session === undefined) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading…
+      </div>
+    );
+  }
+
+  /* ---------- render ---------- */
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Your Calendar Summaries</h1>
+
         <div className="space-x-3">
           <button
             onClick={connectGoogle}
@@ -51,6 +76,7 @@ const bearer  = { headers: { Authorization: `Bearer ${session?.access_token}` } 
           >
             Connect Google
           </button>
+
           <button
             onClick={() => supabase.auth.signOut()}
             className="px-3 py-1 bg-red-500 text-white rounded"
@@ -60,28 +86,45 @@ const bearer  = { headers: { Authorization: `Bearer ${session?.access_token}` } 
         </div>
       </header>
 
-      <button
-        onClick={fetchEvents}
-        className="mb-6 px-3 py-1 bg-blue-500 text-white rounded"
-      >
-        Refresh Events
-      </button>
+      <div className="mb-6 space-x-2">
+        <button
+          onClick={() => fetchEvents(false)}
+          className="px-3 py-1 bg-blue-500 text-white rounded"
+        >
+          Refresh Events
+        </button>
+
+        <button
+          onClick={() => fetchEvents(true)}
+          className="px-3 py-1 bg-purple-600 text-white rounded"
+        >
+          Regenerate Summaries
+        </button>
+      </div>
 
       {loading ? (
         <p>Loading…</p>
       ) : events.length === 0 ? (
-        <p>No events yet.</p>
+        <p>No events to display.</p>
       ) : (
         <ul className="space-y-4">
           {events.map((ev) => (
             <li
-              key={ev.id}
-              className="p-4 bg-white shadow rounded border border-gray-200"
+              key={ev.google_event_id ?? ev.id}
+              className="p-4 bg-white shadow rounded border"
             >
               <h2 className="font-semibold">{ev.title}</h2>
               <p className="text-sm text-gray-500">
-                {new Date(ev.start).toLocaleString()}
+                {new Date(ev.start_time).toLocaleString()}
               </p>
+
+              {ev.summary ? (
+                <p className="mt-2">{ev.summary}</p>
+              ) : (
+                <p className="mt-2 italic text-gray-400">
+                  Summary not generated.
+                </p>
+              )}
             </li>
           ))}
         </ul>
