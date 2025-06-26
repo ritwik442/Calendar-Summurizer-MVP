@@ -102,8 +102,6 @@ const { data: dbEvents } = await supabase
   .eq('user_id', user_id)
   .order('start_time', { ascending: true });   // ← no .limit()
    
-
-    if (err) console.error('[Supabase] upsert error', err);
     
     res.json(dbEvents);
   } catch (err) {
