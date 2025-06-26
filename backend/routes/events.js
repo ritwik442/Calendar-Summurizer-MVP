@@ -12,10 +12,10 @@ const { summarizeEvent } = require('../services/openaiService');
 /* ---------- middleware: pull user_id from Supabase JWT ---------- */
 function extractUserId(req, res, next) {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ err: 'No Supabase JWT' });
+  if (!token) return res.status(401).json({ error: 'No Supabase JWT' });
 
   const payload = jwt.decode(token);
-  if (!payload?.sub) return res.status(400).json({ err: 'Bad JWT' });
+  if (!payload?.sub) return res.status(400).json({ error: 'Bad JWT' });
 
   req.user_id = payload.sub;
   next();
@@ -35,7 +35,7 @@ router.get('/', extractUserId, async (req, res) => {
     /* 1️⃣  Ensure we have a fresh Google OAuth client */
     const oauthClient = await getValidTokens(user_id);
     if (!oauthClient)
-      return res.status(400).json({ err: 'Google account not linked' });
+      return res.status(400).json({ error: 'Google account not linked' });
 
     /* 2️⃣  Pull next 10 Google Calendar events */
     const calendar = google.calendar({ version: 'v3', auth: oauthClient });
@@ -103,12 +103,12 @@ const { data: dbEvents } = await supabase
   .order('start_time', { ascending: true });   // ← no .limit()
    
 
-    if (err) console.error('[Supabase] upsert err', err);
+    if (error) console.error('[Supabase] upsert error', error);
     
     res.json(dbEvents);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ err: 'Server err' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
