@@ -39,14 +39,14 @@ router.get('/', extractUserId, async (req, res) => {
 
     /* 2️⃣  Pull next 10 Google Calendar events */
     const calendar = google.calendar({ version: 'v3', auth: oauthClient });
-     const lookBackMs = 24 * 60 * 60 * 1000;  
+   const lookBackMs = 7 * 24 * 60 * 60 * 1000;   // 7 days
 const { data } = await calendar.events.list({
-   calendarId: 'primary',
-   timeMin: new Date(Date.now() - lookBackMs).toISOString(),
-   maxResults: 50,                                 // pull more rows just in case
-   singleEvents: true,
-   orderBy: 'startTime',
- });
+  calendarId: 'primary',
+  timeMin: new Date(Date.now() - lookBackMs).toISOString(),
+  maxResults: 100,
+  singleEvents: true,
+  orderBy: 'startTime',
+});
 
 
     const items = data.items ?? [];
@@ -96,12 +96,11 @@ const { data } = await calendar.events.list({
     }
 
     /* 5️⃣  Return merged events from DB */
- const { data: dbEvents, error } = await supabase
-   .from('events')
-   .select('*')
-   .eq('user_id', user_id)
-   .order('start_time', { ascending: true })
-   .limit(10);
+const { data: dbEvents } = await supabase
+  .from('events')
+  .select('*')
+  .eq('user_id', user_id)
+  .order('start_time', { ascending: true });   // ← no .limit()
    
 
     if (error) console.error('[Supabase] upsert error', error);
