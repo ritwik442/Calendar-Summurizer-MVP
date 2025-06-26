@@ -1,6 +1,5 @@
 require('dotenv').config();   
-console.log('[DEBUG FRONTEND]', process.env.FRONTEND_ORIGIN);       
-
+console.log('[DEBUG FRONTEND]', process.env.FRONTEND_ORIGIN);
 const express = require('express');
 const cors = require('cors');
 const app  = express();
