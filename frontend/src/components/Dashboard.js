@@ -39,7 +39,7 @@ setEvents(Array.isArray(data) ? data : []);
   const connectGoogle = async () => {
     if (!session) return;
     try {
-     const { data } = await axios.get(`${API_BASE}api/google/auth-url`, bearer);
+     const { data } = await axios.get(`${API_BASE}/api/google/auth-url`, bearer);
 ;
       window.location.href = data.url;     // redirect to Google consent
     } catch (err) {
