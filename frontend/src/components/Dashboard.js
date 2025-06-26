@@ -64,19 +64,53 @@ setEvents(Array.isArray(data) ? data : []);
     );
   }
 
+/* ---------- render ---------- */
 return (
   <div className="min-h-screen bg-gray-50 p-6">
-    {/* …header and buttons stay the same … */}
+    {/* ----- Header & buttons appear no matter what ----- */}
+    <header className="flex justify-between items-center mb-8">
+      <h1 className="text-2xl font-bold">Your Calendar Summaries</h1>
 
-    {loading && <p>Loading…</p>}
+      <div className="space-x-3">
+        <button
+          onClick={connectGoogle}
+          className="px-3 py-1 bg-green-600 text-white rounded"
+        >
+          Connect Google
+        </button>
 
-    {/* 1️⃣ no loading, events is an array, but empty */}
-    {!loading && Array.isArray(events) && events.length === 0 && (
+        <button
+          onClick={() => supabase.auth.signOut()}
+          className="px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Sign out
+        </button>
+      </div>
+    </header>
+
+    {/* ----- Action buttons ----- */}
+    <div className="mb-6 space-x-2">
+      <button
+        onClick={() => fetchEvents(false)}
+        className="px-3 py-1 bg-blue-500 text-white rounded"
+      >
+        Refresh Events
+      </button>
+
+      <button
+        onClick={() => fetchEvents(true)}
+        className="px-3 py-1 bg-purple-600 text-white rounded"
+      >
+        Regenerate Summaries
+      </button>
+    </div>
+
+    {/* ----- Dynamic content ----- */}
+    {loading ? (
+      <p>Loading…</p>
+    ) : !Array.isArray(events) || events.length === 0 ? (
       <p>No events to display.</p>
-    )}
-
-    {/* 2️⃣ events is an array with items → safe to .map() */}
-    {!loading && Array.isArray(events) && events.length > 0 && (
+    ) : (
       <ul className="space-y-4">
         {events.map((ev) => (
           <li
@@ -101,4 +135,5 @@ return (
     )}
   </div>
 );
+
 }
