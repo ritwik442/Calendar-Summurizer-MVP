@@ -26,7 +26,7 @@ console.log('[DEBUG] Full URL =', `${API_BASE}/api/events?withSummaries=false`);
       console.log('[DEBUG] API_BASE =', API_BASE);
 console.log('[DEBUG] Full URL =', `${API_BASE}/api/events?withSummaries=false`);
     try {
-const { data } = await axios.get(`${API_BASE}api/events?withSummaries=${withSummaries}`, bearer);
+const { data } = await axios.get(`${API_BASE}/api/events?withSummaries=${withSummaries}`, bearer);
 setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
