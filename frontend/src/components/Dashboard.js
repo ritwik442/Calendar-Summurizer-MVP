@@ -23,6 +23,8 @@ console.log('[DEBUG] Full URL =', `${API_BASE}/api/events?withSummaries=false`);
   const fetchEvents = async (withSummaries = false) => {
     if (!session) return;                  // guard while signed-out
     setLoading(true);
+      console.log('[DEBUG] API_BASE =', API_BASE);
+console.log('[DEBUG] Full URL =', `${API_BASE}/api/events?withSummaries=false`);
     try {
 const { data } = await axios.get(`${API_BASE}api/events?withSummaries=${withSummaries}`, bearer);
 setEvents(Array.isArray(data) ? data : []);
