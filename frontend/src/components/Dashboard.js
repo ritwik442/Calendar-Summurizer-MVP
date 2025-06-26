@@ -64,76 +64,72 @@ setEvents(Array.isArray(data) ? data : []);
     );
   }
 
-/* ---------- render ---------- */
-return (
-  <div className="min-h-screen bg-gray-50 p-6">
-    {/* ----- Header & buttons appear no matter what ----- */}
-    <header className="flex justify-between items-center mb-8">
-      <h1 className="text-2xl font-bold">Your Calendar Summaries</h1>
+  /* ---------- render ---------- */
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Your Calendar Summaries</h1>
 
-      <div className="space-x-3">
+        <div className="space-x-3">
+          <button
+            onClick={connectGoogle}
+            className="px-3 py-1 bg-green-600 text-white rounded"
+          >
+            Connect Google
+          </button>
+
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="px-3 py-1 bg-red-500 text-white rounded"
+          >
+            Sign out
+          </button>
+        </div>
+      </header>
+
+      <div className="mb-6 space-x-2">
         <button
-          onClick={connectGoogle}
-          className="px-3 py-1 bg-green-600 text-white rounded"
+          onClick={() => fetchEvents(false)}
+          className="px-3 py-1 bg-blue-500 text-white rounded"
         >
-          Connect Google
+          Refresh Events
         </button>
 
         <button
-          onClick={() => supabase.auth.signOut()}
-          className="px-3 py-1 bg-red-500 text-white rounded"
+          onClick={() => fetchEvents(true)}
+          className="px-3 py-1 bg-purple-600 text-white rounded"
         >
-          Sign out
+          Regenerate Summaries
         </button>
       </div>
-    </header>
 
-    {/* ----- Action buttons ----- */}
-    <div className="mb-6 space-x-2">
-      <button
-        onClick={() => fetchEvents(false)}
-        className="px-3 py-1 bg-blue-500 text-white rounded"
-      >
-        Refresh Events
-      </button>
-
-      <button
-        onClick={() => fetchEvents(true)}
-        className="px-3 py-1 bg-purple-600 text-white rounded"
-      >
-        Regenerate Summaries
-      </button>
-    </div>
-
-    {/* ----- Dynamic content ----- */}
-    {loading ? (
-      <p>Loading…</p>
-    ) : !Array.isArray(events) || events.length === 0 ? (
-      <p>No events to display.</p>
-    ) : (
-      <ul className="space-y-4">
-        {events.map((ev) => (
-          <li
-            key={ev.google_event_id ?? ev.id}
-            className="p-4 bg-white shadow rounded border"
-          >
-            <h2 className="font-semibold">{ev.title}</h2>
-            <p className="text-sm text-gray-500">
-              {new Date(ev.start_time).toLocaleString()}
-            </p>
-
-            {ev.summary ? (
-              <p className="mt-2">{ev.summary}</p>
-            ) : (
-              <p className="mt-2 italic text-gray-400">
-                Summary not generated.
+      {loading ? (
+        <p>Loading…</p>
+      ) : events.length === 0 ? (
+        <p>No events to display.</p>
+      ) : (
+        <ul className="space-y-4">
+          {events.map((ev) => (
+            <li
+              key={ev.google_event_id ?? ev.id}
+              className="p-4 bg-white shadow rounded border"
+            >
+              <h2 className="font-semibold">{ev.title}</h2>
+              <p className="text-sm text-gray-500">
+                {new Date(ev.start_time).toLocaleString()}
               </p>
-            )}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
 
+              {ev.summary ? (
+                <p className="mt-2">{ev.summary}</p>
+              ) : (
+                <p className="mt-2 italic text-gray-400">
+                  Summary not generated.
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
