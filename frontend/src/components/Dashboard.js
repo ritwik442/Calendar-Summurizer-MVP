@@ -18,14 +18,13 @@ export default function Dashboard() {
       : null;
 
   /* ---------- API calls ---------- */
+  console.log('[DEBUG] API_BASE =', API_BASE);
+console.log('[DEBUG] Full URL =', `${API_BASE}/api/events?withSummaries=false`);
   const fetchEvents = async (withSummaries = false) => {
     if (!session) return;                  // guard while signed-out
     setLoading(true);
     try {
-const { data } = await axios.get(
-  `${API_BASE}/api/events?withSummaries=${withSummaries}`,
-  bearer
-);
+const { data } = await axios.get(`${API_BASE}api/events?withSummaries=${withSummaries}`, bearer);
 setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
@@ -38,10 +37,8 @@ setEvents(Array.isArray(data) ? data : []);
   const connectGoogle = async () => {
     if (!session) return;
     try {
-     const { data } = await axios.get(
-  `${API_BASE}/api/google/auth-url`,
-   bearer
-);
+     const { data } = await axios.get(`${API_BASE}api/google/auth-url`, bearer);
+;
       window.location.href = data.url;     // redirect to Google consent
     } catch (err) {
       console.error(err);
