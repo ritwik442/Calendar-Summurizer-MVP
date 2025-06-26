@@ -64,72 +64,41 @@ setEvents(Array.isArray(data) ? data : []);
     );
   }
 
-  /* ---------- render ---------- */
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Your Calendar Summaries</h1>
+return (
+  <div className="min-h-screen bg-gray-50 p-6">
+    {/* …header and buttons stay the same … */}
 
-        <div className="space-x-3">
-          <button
-            onClick={connectGoogle}
-            className="px-3 py-1 bg-green-600 text-white rounded"
+    {loading && <p>Loading…</p>}
+
+    {/* 1️⃣ no loading, events is an array, but empty */}
+    {!loading && Array.isArray(events) && events.length === 0 && (
+      <p>No events to display.</p>
+    )}
+
+    {/* 2️⃣ events is an array with items → safe to .map() */}
+    {!loading && Array.isArray(events) && events.length > 0 && (
+      <ul className="space-y-4">
+        {events.map((ev) => (
+          <li
+            key={ev.google_event_id ?? ev.id}
+            className="p-4 bg-white shadow rounded border"
           >
-            Connect Google
-          </button>
+            <h2 className="font-semibold">{ev.title}</h2>
+            <p className="text-sm text-gray-500">
+              {new Date(ev.start_time).toLocaleString()}
+            </p>
 
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="px-3 py-1 bg-red-500 text-white rounded"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
-
-      <div className="mb-6 space-x-2">
-        <button
-          onClick={() => fetchEvents(false)}
-          className="px-3 py-1 bg-blue-500 text-white rounded"
-        >
-          Refresh Events
-        </button>
-
-        <button
-          onClick={() => fetchEvents(true)}
-          className="px-3 py-1 bg-purple-600 text-white rounded"
-        >
-          Regenerate Summaries
-        </button>
-      </div>
-
-      {loading ? (
-        <p>Loading…</p>
-      ) : events.length === 0 ? (
-        <p>No events to display.</p>
-      ) : (
-        <ul className="space-y-4">
-          {events.map((ev) => (
-            <li
-              key={ev.google_event_id ?? ev.id}
-              className="p-4 bg-white shadow rounded border"
-            >
-              <h2 className="font-semibold">{ev.title}</h2>
-              <p className="text-sm text-gray-500">
-                {new Date(ev.start_time).toLocaleString()}
+            {ev.summary ? (
+              <p className="mt-2">{ev.summary}</p>
+            ) : (
+              <p className="mt-2 italic text-gray-400">
+                Summary not generated.
               </p>
-
-              {ev.summary ? (
-                <p className="mt-2">{ev.summary}</p>
-              ) : (
-                <p className="mt-2 italic text-gray-400">
-                  Summary not generated.
-                </p>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+            )}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
 }
