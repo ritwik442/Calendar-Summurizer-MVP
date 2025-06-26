@@ -100,7 +100,8 @@ const { data: dbEvents } = await supabase
   .from('events')
   .select('*')
   .eq('user_id', user_id)
-  .order('start_time', { ascending: true });  
+  .order('start_time', { ascending: true })
+  .limit(10);  
    
     
     res.json(dbEvents);
