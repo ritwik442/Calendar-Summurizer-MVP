@@ -22,11 +22,11 @@ export default function Dashboard() {
     if (!session) return;                  // guard while signed-out
     setLoading(true);
     try {
-      const { data } = await axios.get(
-  `${API_BASE}/api/google/auth-url`,
-   bearer
+const { data } = await axios.get(
+  `${API_BASE}/api/events?withSummaries=${withSummaries}`,
+  bearer
 );
-      setEvents(data);
+setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error ?? 'Failed to fetch events');
