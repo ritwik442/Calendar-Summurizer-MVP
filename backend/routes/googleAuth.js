@@ -42,7 +42,7 @@ router.get('/callback', async (req, res) => {
 
  const frontEndURL = process.env.FRONTEND_ORIGIN;
 
- return res.redirect(`${frontEndURL}/?googleConnected=true`);
+ return res.redirect(`https://calendar-summurizer-mvp.vercel.app/?googleConnected=true`);
 });
 
 module.exports = router;
