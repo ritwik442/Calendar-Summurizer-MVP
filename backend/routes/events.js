@@ -89,7 +89,7 @@ const { data } = await calendar.events.list({
               .update({ summary })
               .eq('google_event_id', ev.id);
           } catch (err) {
-            console.err('OpenAI summary failed:', err.message);
+            console.error('OpenAI summary failed:', err.message);
           }
         })
       );
@@ -103,11 +103,11 @@ const { data: dbEvents } = await supabase
   .order('start_time', { ascending: true });   // ← no .limit()
    
 
-    if (err) console.err('[Supabase] upsert err', err);
+    if (err) console.error('[Supabase] upsert err', err);
     
     res.json(dbEvents);
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(500).json({ err: 'Server err' });
   }
 });
