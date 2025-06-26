@@ -40,8 +40,9 @@ router.get('/callback', async (req, res) => {
   const { tokens } = await oauth2Client.getToken(code);
   await upsertTokens({ user_id: state, tokens });
 
-  // Redirect back to the app (you can pass a query flag)
-  return res.redirect('http://localhost:3000/?googleConnected=true');
+ const frontEndURL = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+
+ return res.redirect(`${frontEndURL}/?googleConnected=true`);
 });
 
 module.exports = router;

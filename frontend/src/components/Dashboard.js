@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { supabase } from '../lib/supabaseClient';
 import useSession from '../hooks/useSession';
+import { API_BASE } from '../lib/apiBase';
 
 export default function Dashboard() {
   /* ---------- state ---------- */
@@ -22,9 +23,9 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `http://localhost:4000/api/events?withSummaries=${withSummaries}`,
-        bearer
-      );
+  `${API_BASE}/api/google/auth-url`,
+   bearer
+);
       setEvents(data);
     } catch (err) {
       console.error(err);
@@ -37,10 +38,10 @@ export default function Dashboard() {
   const connectGoogle = async () => {
     if (!session) return;
     try {
-      const { data } = await axios.get(
-        'http://localhost:4000/api/google/auth-url',
-        bearer
-      );
+     const { data } = await axios.get(
+  `${API_BASE}/api/google/auth-url`,
+   bearer
+);
       window.location.href = data.url;     // redirect to Google consent
     } catch (err) {
       console.error(err);

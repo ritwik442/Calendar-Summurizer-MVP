@@ -15,7 +15,7 @@ const openai = new OpenAI({
 ------------------------------------------------------------- */
 async function summarizeEvent(event) {
   const prompt = `
-You are a helpful productivity assistant. Summarize the calendar
+Summarize the calendar
 event below in 1–2 concise sentences (≤ 40 words).
 
 Title: ${event.summary ?? '(no title)'}
