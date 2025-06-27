@@ -41,8 +41,9 @@ router.get('/callback', async (req, res) => {
   await upsertTokens({ user_id: state, tokens });
 
  const frontEndURL = process.env.FRONTEND_ORIGIN;
+ console.log(frontEndURL);
 
- return res.redirect(`https://calendar-summurizer-mvp.vercel.app/?googleConnected=true`);
+ return res.redirect(`${frontEndURL}/?googleConnected=true`);
 });
 
 module.exports = router;
