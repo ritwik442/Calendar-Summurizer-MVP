@@ -18,4 +18,6 @@ Hosting: **Vercel+Railway**
 
 API: **Google Calendar+OpenAI API**
 
+Database: **Supabase**
+
 
